@@ -16,7 +16,13 @@ $(document).on("keydown", function (e) {
     if ((e.key === "Enter") && (currentLevel === 0)) {
         nextSequence();
     }
-})   
+})
+
+$(document).on("touchstart", function (e) {
+    if (currentLevel === 0) {
+        nextSequence();
+    }
+})
 
 playerButtonSelection();
 
