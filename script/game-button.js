@@ -10,6 +10,11 @@ export class GameButton {
 
     setButtonColor(newColor) { this.#initButton(newColor); }
 
+    playerButtonInteraction() {
+        this.buttonAnimation();
+        this.pressedByPlayerAnimation();
+    }
+    
     buttonAnimation() {
         this.playButtonSound();
         this.buttonActivationFlash();

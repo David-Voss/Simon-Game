@@ -1,136 +1,171 @@
 import { GameButton } from "./game-button.js";
 
-const greenButton = new GameButton("green");
-const redButton = new GameButton("red");
-const yellowButton = new GameButton("yellow");
-const blueButton = new GameButton("blue");
-
-let currentLevel = 0;
-let restartMessageTimeout = null;
-
-let buttons = [greenButton, redButton, yellowButton, blueButton];
-let buttonsSelectedRandomly = [];
-let buttonsSelectedByPlayer = [];
-
-$(document).on("keydown", function (e) {
-    if ((e.key === "Enter") && (currentLevel === 0)) {
-        nextSequence();
+export class SimonGame {
+    constructor() {
+        this.#setUpInitialGameValues();        
     }
-})
 
-$(document).on("touchstart", function (e) {
-    if (currentLevel === 0) {
-        nextSequence();
+    #setUpInitialGameValues() {
+        this.#initGameButtons();
+        this.#initClassVariables();
     }
-})
 
-playerButtonSelection();
+    #initGameButtons() {
+        this.buttons = [
+            new GameButton("green"),
+            new GameButton("red"),
+            new GameButton("yellow"),
+            new GameButton("blue")
+        ];
+    }
 
-function playerButtonSelection () {
-    $("div.btn").each((index, btn) => {
-        $(btn).on("click", () => {
-            if (currentLevel === 0) return; 
+    #initClassVariables() {
+        this.currentLevel = 0;
+        this.restartMessageTimeout = null;
 
-            for (let i = 0; i < buttons.length; i++) {
-                if ($(btn).attr("id") === buttons[i].getHtmlID()) {
-                    let button = buttons[i];
-                    button.buttonAnimation();
-                    buttonsSelectedByPlayer.push(button.getHtmlID());
+        this.randomSequence = [];
+        this.playerInputSequence = [];
+    }
 
-                    button.pressedByPlayerAnimation();
+    initGame() {
+        this.#initEventListeners();
+    }
 
-                    console.log(button.getHtmlID());
-                    console.log(buttonsSelectedByPlayer);
+    #initEventListeners() {
+        this.#initKeyListener();
+        this.#initTouchListener();
+        this.#initClickListener();    
+    }
 
-                    if (!compareSelections()) {
-                        resetGame();
-                    }
-                }
+    #initKeyListener() {
+        $(document).on("keydown", (e) => {
+            if (e.key === "Enter") {
+                this.#startGameIfHasNotBeenStarted();
             }
         });
-    });
-}
-
-function nextSequence() {
-    if (restartMessageTimeout) {
-        clearTimeout(restartMessageTimeout);
-        restartMessageTimeout = null;
     }
 
-    currentLevel++;
-    $("h1").text(`Level ${currentLevel}`);
-    selectRandomButton();
-}
 
-function success() {
-    successSound();
-    gameStateText("CORRECT!", "success");
-}
+    #initTouchListener() {
+        $(document).on("touchstart", (e) => {
+            this.#startGameIfHasNotBeenStarted();
+        });
+    }
 
-function successSound() {
-    let audio = new Audio("./sounds/success.mp3");
-    audio.play();
-}
+    #startGameIfHasNotBeenStarted() {
+        if (this.currentLevel === 0) {
+            this.#nextSequence();
+        }
+    }
 
-function gameOver() {
-    gameOverSound ();
-    gameStateText("WRONG!", "game-over");
-}
+    #initClickListener() {
+        $("div.btn").each((_, btn) => {
+            $(btn).on("click", () => this.#handlePlayerClick(btn));
+        });
+    }
 
-function gameStateText(text, cssClass) {
-    $("body").addClass(cssClass);
+    #handlePlayerClick(btn) {        
+        if (this.currentLevel === 0) { return; }
+        
+        const clickedId = $(btn).attr("id");
+        const clickedButton = this.buttons.find(b => b.getHtmlID() === clickedId);
+
+        if (!clickedButton) { return; }
+
+        clickedButton.playerButtonInteraction();
+        this.playerInputSequence.push(clickedId);
+
+        if (!this.#compareSelections()) {
+            this.#resetGame();
+        }       
+    }
+
+    #compareSelections() {
+        const index = this.playerInputSequence.length - 1;
+
+        if (this.playerInputSequence[index] !== this.randomSequence[index]) {
+            return false;
+        }
+
+        if (this.playerInputSequence.length === this.randomSequence.length) {        
+            this.#gameState("./sounds/success.mp3", "CORRECT!", "success");
+            this.playerInputSequence = [];
+            this.#timeOut(this.#nextSequence.bind(this), 1000);
+        }
+
+        return true;
+    }
+
+    #resetGame() {
+        this.#gameState("./sounds/wrong.mp3", "WRONG!", "game-over");
+        const completedLevels = this.currentLevel - 1;
+        this.#resetGameState();        
+
+        this.restartMessageTimeout = this.#timeOut(() => {
+           this.#changeText("h1", "html", 
+                `Press ENTER to Restart!<br><br>
+                Completed Levels: ${completedLevels}`)
+        }, 1500);     
+    }
+
+    #resetGameState() {
+        this.currentLevel = 0
+        this.randomSequence = [];
+        this.playerInputSequence = [];
+    }
+
+    #gameState(soundSrc, message, cssClass) {
+        this.#playGameStateSound(soundSrc);
+        this.#gameStateText(message, cssClass);
+    }
+
+    #playGameStateSound(src) {
+        const audio = new Audio(src);
+        audio.play();
+    }
+
+    #gameStateText(text, cssClass) {
+        this.#toggleClassDelayed("body", cssClass, 200);
+        this.#changeText("h1", "html", text);
+    }
+
+    #toggleClassDelayed(element, cssClass, time) {
+        $(element).addClass(cssClass);
+        this.#timeOut(() => $(element).removeClass(cssClass), time);
+    }
+
+    #nextSequence() {
+        if (this.restartMessageTimeout) {
+            clearTimeout(this.restartMessageTimeout);
+            this.restartMessageTimeout = null;
+        }
+
+        this.currentLevel++;
+        this.#changeText("h1", "text", `Level ${this.currentLevel}`);
+        this.#selectRandomButton();
+    }
+
+    #selectRandomButton() {
+        const selectedButton = this.buttons[this.#randomNumber()];          
+        this.randomSequence.push(selectedButton.getHtmlID()); 
+        selectedButton.buttonAnimation();  
+    }
+
+    #changeText(element, textOrHtml, inputText) {
+        if (textOrHtml === "text") {
+            $(element).text(inputText);
+        } else {
+            $(element).html(inputText);
+        }        
+    }
+
+    #randomNumber() {
+        return Math.floor(Math.random() * 4);
+    }
+
+    #timeOut(execution, time, ...args) {
         setTimeout(() => {
-            $("body").removeClass(cssClass);
-        }, 200);
-    $("h1").html(text);
-}
-
-function gameOverSound() {
-    let audio = new Audio("./sounds/wrong.mp3");
-    audio.play();
-}
-
-function resetGame() {
-    
-
-    gameOver();
-    let completedLevels = currentLevel - 1;
-    currentLevel = 0
-    buttonsSelectedRandomly = [];
-    buttonsSelectedByPlayer = []
-    ;
-    restartMessageTimeout = setTimeout(() => {
-        $("h1").html(`Press ENTER to Restart!<br><br>Completed Levels: ${completedLevels}`);    
-    }, 1500);    
-
-    
-}
-
-function compareSelections() {
-    const index = buttonsSelectedByPlayer.length - 1;
-
-    if (buttonsSelectedByPlayer[index] !== buttonsSelectedRandomly[index]) {
-        return false;
+            execution(...args);
+        }, time);
     }
-
-    if (buttonsSelectedByPlayer.length === buttonsSelectedRandomly.length) {
-        success();
-        buttonsSelectedByPlayer = [];
-        setTimeout(() => {
-            nextSequence();
-        }, 1000);
-    }
-
-    return true;
-}
-
-function selectRandomButton() {
-    let selectedButton = buttons[randomNumber()];          
-    buttonsSelectedRandomly.push(selectedButton.getHtmlID()); 
-    selectedButton.buttonAnimation();                          
-    console.log(buttonsSelectedRandomly);    
-}
-
-function randomNumber() {
-    return Math.floor(Math.random() * 4);
 }
