@@ -1,61 +1,144 @@
-body {
-  text-align: center;
-  background-color: #011F3F;
+/* === CSS VARIABLES === */
+:root {
+  --bg-color:        #011F3F;
+  --fg-color:        #FEF2BF;
+  --green:            #008000;
+  --red:              #ff0000;
+  --yellow:           #ffff00;
+  --blue:             #0000ff;
+
+  --btn-size:         12.5rem;
+  --btn-border:       0.625rem;
+  --btn-gap:          2rem;
+  --transition-speed: 0.1s;
 }
 
-#game-text {
-  height: 15rem;
+/* === RESET === */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* === BASE STYLES === */
+
+html {
+  font-family: 'Press Start 2P', cursive;
+  background-color: var(--bg-color);
+  color: var(--fg-color);
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;  
+  
+  text-align: center;
+
+  
+}
+
+.flex-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+/* === HEADER === */
+.header {
+  height: 18.75rem;
+  padding: 2rem 0 3rem 0;
 }
 
 #level-title {
-  font-family: 'Press Start 2P', cursive;
-  font-size: 3rem;
-  margin:  5%;
-  color: #FEF2BF;
+  font-size: 2.25rem;
+  margin: 5% auto;
 }
 
-.container {
-  display: block;
-  width: 50%;
-  margin: auto;
+
+/* === GRID LAYOUT === */
+
+.grid-container {
+  height: 50%;
+  flex: 1;                       
+  display: grid;
+  grid-template-columns: repeat(2, var(--btn-size));
+  grid-gap: var(--btn-gap);
+  justify-content: center;      
+  align-content: center;        
 }
+
+/* === BUTTON STYLES === */
 
 .btn {
-  margin: 25px;
-  display: inline-block;
-  height: 200px;
-  width: 200px;
-  border: 10px solid black;
+  width: var(--btn-size);
+  height: var(--btn-size);
+  border: var(--btn-border) solid #000;
   border-radius: 20%;
+  transition:
+    background-color var(--transition-speed),
+    box-shadow      var(--transition-speed);
 }
 
+.green  { background-color: var(--green);  }
+.red    { background-color: var(--red);    }
+.yellow { background-color: var(--yellow); }
+.blue   { background-color: var(--blue);   }
+
+
+/* === PRESSED STATE === */
+
+.pressed {
+  box-shadow: 0 0 20px #fff;
+  background-color: grey;
+}
+
+
+/* === FEEDBACK STATES === */
+
 .success {
-  background-color: green;
+  background-color: var(--green);
   opacity: 0.8;
 }
 
 .game-over {
-  background-color: red;
+  background-color: var(--red);
   opacity: 0.8;
 }
 
-.red {
-  background-color: red;
+
+/* === FOOTER & CREDITS === */
+
+.footer {
+  height: 25%;
+  width: 100%;
+  font-size: 0.875rem;
+  padding: 3rem 0;
+  margin: 5% auto;
 }
 
-.green {
-  background-color: green;
+.credit {
+  text-align: center;
+  line-height: 1.6;
 }
 
-.blue {
-  background-color: blue;
+.credit a {
+  color: inherit;
+  font-style: italic;
+  text-decoration: underline dotted;
 }
 
-.yellow {
-  background-color: yellow;
+.credit a:hover,
+.credit a:focus {
+  text-decoration: underline  ;
+  outline: none;
 }
 
-.pressed {
-  box-shadow: 0 0 20px white;
-  background-color: grey;
+.credit a:focus-visible {
+  outline: 2px dashed #FEF2BF;
 }

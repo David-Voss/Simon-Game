@@ -1,15 +1,58 @@
+// === DEPENDENCIES ===
+
+import { GameUtils } from "./game-utils.js";
 import { GameButton } from "./game-button.js";
 
+
+/**
+ * The core logic class for the Simon Game.
+ * 
+ * Manages game flow, button interactions, level progression and input handling.
+ * Designed to be initialised and then started via `initGame()`.
+ */
 export class SimonGame {
+
+    // === CLASS INITIALISATION ===
+
+    /**
+     * Creates a new Simon Game instance and prepares internal state.
+     */
     constructor() {
         this.#setUpInitialGameValues();        
     }
 
+    /**
+     * Public initialisation method. Binds all required input listeners.
+     */
+    initGame() {
+        this.#initEventListeners();
+    }
+
+
+    // === SETUP METHODS ===
+
+    /**
+     * Sets up the game state and button references.
+     */
     #setUpInitialGameValues() {
         this.#initGameButtons();
         this.#initClassVariables();
     }
 
+    /**
+     * Initialises core game variables.
+     */
+    #initClassVariables() {
+        this.currentLevel = 0;
+        this.restartMessageTimeout = null;
+        this.randomSequence = [];
+        this.playerInputSequence = [];
+        this.isInputLocked = false; // prevents rapid/multiple input before sequence ends
+    }
+
+    /**
+     * Instantiates and stores button references.
+     */
     #initGameButtons() {
         this.buttons = [
             new GameButton("green"),
@@ -17,26 +60,23 @@ export class SimonGame {
             new GameButton("yellow"),
             new GameButton("blue")
         ];
-    }
+    } 
+    
 
-    #initClassVariables() {
-        this.currentLevel = 0;
-        this.restartMessageTimeout = null;
+    // === EVENT LISTENER REGISTRATION ===
 
-        this.randomSequence = [];
-        this.playerInputSequence = [];
-    }
-
-    initGame() {
-        this.#initEventListeners();
-    }
-
+    /**
+     * Binds all input events: key, touch and mouse.
+     */
     #initEventListeners() {
         this.#initKeyListener();
         this.#initTouchListener();
         this.#initClickListener();    
     }
 
+    /**
+     * Listens for 'Enter' key to start or restart the game.
+     */
     #initKeyListener() {
         $(document).on("keydown", (e) => {
             if (e.key === "Enter") {
@@ -46,29 +86,56 @@ export class SimonGame {
     }
 
 
+    /**
+     * Listens for any touch to start the game (useful for mobile).
+     */
     #initTouchListener() {
         $(document).on("touchstart", (e) => {
             this.#startGameIfHasNotBeenStarted();
         });
     }
 
-    #startGameIfHasNotBeenStarted() {
-        if (this.currentLevel === 0) {
-            this.#nextSequence();
-        }
-    }
-
+    /**
+     * Adds click handlers to each game button.
+     */
     #initClickListener() {
         $("div.btn").each((_, btn) => {
             $(btn).on("click", () => this.#handlePlayerClick(btn));
         });
     }
 
+
+    // === GAME FLOW CONTROL ===
+
+    /**
+     * Starts the game sequence if in reset state.
+     * Also clears any pending restart timeout.
+     */
+    #startGameIfHasNotBeenStarted() {
+        if (this.restartMessageTimeout) {
+            clearTimeout(this.restartMessageTimeout);
+            this.restartMessageTimeout = null;
+        }
+
+        if (this.currentLevel === 0) {
+            this.#nextSequence();
+        }
+    }
+
+
+    // === PLAYER INTERACTION ===
+
+    /**
+     * Handles the player's button input, comparing it to the generated sequence.
+     * If incorrect, triggers game over.
+     * 
+     * @param {HTMLElement} btn - The clicked button element
+     */
     #handlePlayerClick(btn) {        
-        if (this.currentLevel === 0) { return; }
+        if (this.currentLevel === 0 || this.isInputLocked) { return; }
         
         const clickedId = $(btn).attr("id");
-        const clickedButton = this.buttons.find(b => b.getHtmlID() === clickedId);
+        const clickedButton = this.buttons.find(b => b.getHtmlId() === clickedId);
 
         if (!clickedButton) { return; }
 
@@ -80,6 +147,12 @@ export class SimonGame {
         }       
     }
 
+    /**
+     * Compares the player's input to the expected sequence.
+     * Triggers next sequence if completed correctly.
+     * 
+     * @returns {boolean} Whether the current input is still correct.
+     */
     #compareSelections() {
         const index = this.playerInputSequence.length - 1;
 
@@ -88,52 +161,21 @@ export class SimonGame {
         }
 
         if (this.playerInputSequence.length === this.randomSequence.length) {        
-            this.#gameState("./sounds/success.mp3", "CORRECT!", "success");
+            GameUtils.showFeedback("./sounds/success.mp3", "CORRECT!", "success");
             this.playerInputSequence = [];
-            this.#timeOut(this.#nextSequence.bind(this), 1000);
+            this.isInputLocked = true;
+            GameUtils.timeOut(() => {
+                this.isInputLocked = false;
+                this.#nextSequence();
+            }, 1000);
         }
 
         return true;
-    }
+    }    
 
-    #resetGame() {
-        this.#gameState("./sounds/wrong.mp3", "WRONG!", "game-over");
-        const completedLevels = this.currentLevel - 1;
-        this.#resetGameState();        
-
-        this.restartMessageTimeout = this.#timeOut(() => {
-           this.#changeText("h1", "html", 
-                `Press ENTER to Restart!<br><br>
-                Completed Levels: ${completedLevels}`)
-        }, 1500);     
-    }
-
-    #resetGameState() {
-        this.currentLevel = 0
-        this.randomSequence = [];
-        this.playerInputSequence = [];
-    }
-
-    #gameState(soundSrc, message, cssClass) {
-        this.#playGameStateSound(soundSrc);
-        this.#gameStateText(message, cssClass);
-    }
-
-    #playGameStateSound(src) {
-        const audio = new Audio(src);
-        audio.play();
-    }
-
-    #gameStateText(text, cssClass) {
-        this.#toggleClassDelayed("body", cssClass, 200);
-        this.#changeText("h1", "html", text);
-    }
-
-    #toggleClassDelayed(element, cssClass, time) {
-        $(element).addClass(cssClass);
-        this.#timeOut(() => $(element).removeClass(cssClass), time);
-    }
-
+    /**
+     * Starts a new round by increasing level and adding a new random button to the sequence.
+     */
     #nextSequence() {
         if (this.restartMessageTimeout) {
             clearTimeout(this.restartMessageTimeout);
@@ -141,31 +183,44 @@ export class SimonGame {
         }
 
         this.currentLevel++;
-        this.#changeText("h1", "text", `Level ${this.currentLevel}`);
+        GameUtils.changeText("h1", `Level ${this.currentLevel}`);
         this.#selectRandomButton();
     }
 
+    /**
+     * Appends a new randomly selected button to the expected sequence.
+     */
     #selectRandomButton() {
-        const selectedButton = this.buttons[this.#randomNumber()];          
-        this.randomSequence.push(selectedButton.getHtmlID()); 
+        const selectedButton = this.buttons[GameUtils.randomNumber(4)];          
+        this.randomSequence.push(selectedButton.getHtmlId()); 
         selectedButton.buttonAnimation();  
     }
 
-    #changeText(element, textOrHtml, inputText) {
-        if (textOrHtml === "text") {
-            $(element).text(inputText);
-        } else {
-            $(element).html(inputText);
-        }        
+
+    // === GAME STATE & RESET ===
+
+    /**
+     * Resets the game to initial state after incorrect input.
+     * Displays restart message after short delay.
+     */
+    #resetGame() {
+        GameUtils.showFeedback("./sounds/wrong.mp3", "WRONG!", "game-over");
+        const completedLevels = this.currentLevel - 1;
+        this.#resetGameState();        
+
+        this.restartMessageTimeout = GameUtils.timeOut(() => {
+           GameUtils.changeHtml("h1", 
+                `Press ENTER to Restart!<br><br>
+                Completed Levels: ${completedLevels}`)
+        }, 1500);     
     }
 
-    #randomNumber() {
-        return Math.floor(Math.random() * 4);
-    }
-
-    #timeOut(execution, time, ...args) {
-        setTimeout(() => {
-            execution(...args);
-        }, time);
+    /**
+     * Clears core game data for a fresh start.
+     */
+    #resetGameState() {
+        this.currentLevel = 0
+        this.randomSequence = [];
+        this.playerInputSequence = [];
     }
 }
