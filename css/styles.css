@@ -1,16 +1,16 @@
 /* === CSS VARIABLES === */
 :root {
-  --bg-color:        #011F3F;
-  --fg-color:        #FEF2BF;
+  --bg-color:         #011F3F;
+  --font-color:       #FEF2BF;
   --green:            #008000;
   --red:              #ff0000;
   --yellow:           #ffff00;
   --blue:             #0000ff;
 
-  --btn-size:         12.5rem;
-  --btn-border:       0.625rem;
-  --btn-gap:          2rem;
-  --transition-speed: 0.1s;
+  --btn-size:           12.5rem;  
+  --btn-border:         0.625rem;  
+  --btn-gap:            2rem;  
+  --transition-speed:   0.1s;
 }
 
 /* === RESET === */
@@ -29,30 +29,27 @@
 html {
   font-family: 'Press Start 2P', cursive;
   background-color: var(--bg-color);
-  color: var(--fg-color);
-  height: 100%;
+  color: var(--font-color);
+  height: 100vh;
 }
 
 body {
-  min-height: 100vh;  
-  
+  height: 100vh;    
   text-align: center;
-
-  
-}
-
-.flex-container {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center; 
 }
 
 
 /* === HEADER === */
 .header {
   height: 18.75rem;
-  padding: 2rem 0 3rem 0;
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 #level-title {
@@ -64,13 +61,13 @@ body {
 /* === GRID LAYOUT === */
 
 .grid-container {
-  height: 50%;
   flex: 1;                       
   display: grid;
   grid-template-columns: repeat(2, var(--btn-size));
   grid-gap: var(--btn-gap);
   justify-content: center;      
-  align-content: center;        
+  align-content: center;
+  margin: 2rem auto;        
 }
 
 /* === BUTTON STYLES === */
@@ -118,13 +115,13 @@ body {
   height: 25%;
   width: 100%;
   font-size: 0.875rem;
-  padding: 3rem 0;
-  margin: 5% auto;
+  padding: 2rem 0;
 }
 
 .credit {
   text-align: center;
   line-height: 1.6;
+  margin: 5% 0;
 }
 
 .credit a {

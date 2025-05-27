@@ -210,7 +210,7 @@ export class SimonGame {
 
         this.restartMessageTimeout = GameUtils.timeOut(() => {
            GameUtils.changeHtml("h1", 
-                `Press ENTER to Restart!<br><br>
+                `TOUCH or Press ENTER to Restart!<br><br>
                 Completed Levels: ${completedLevels}`)
         }, 1500);     
     }

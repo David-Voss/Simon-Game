@@ -1,0 +1,61 @@
+/* === CSS VARIABLES === */
+
+:root {
+    --btn-size-tablet:    11.5rem;
+    --btn-border-tablet:  0.525rem;
+    --btn-gap-tablet:     1.75rem;
+}
+
+
+/* === TABLET OPTIMISATION === */
+
+@media (min-width: 481px) and (max-width: 1200px) {
+
+
+    /* === HEADER === */
+
+    .header {
+        height: 14.5rem;
+        padding: 1.5rem 0;
+        margin-bottom: 1.5rem;
+    }
+  
+    #level-title {
+        line-height: 1.6;
+        font-size: 2rem;
+        margin: 3% auto;
+    }
+
+
+    /* === GRID LAYOUT === */
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(2, var(--btn-size-tablet));
+        grid-gap: var(--btn-gap-tablet);
+        margin: 5rem 0;
+    }
+
+
+    /* === BUTTON STYLES === */
+
+    .btn {
+        width: var(--btn-size-tablet);
+        height: var(--btn-size-tablet);
+        border: var(--btn-border-tablet) solid #000;
+        border-radius: 18%;
+    }
+
+
+    /* === FOOTER & CREDITS === */
+
+    .footer {
+        font-size: 0.7rem;
+        padding: 1.5rem 0;
+    }
+
+    .credit {
+        margin: 3% auto;
+        padding: 0 1.5rem;
+    }
+}

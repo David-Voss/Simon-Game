@@ -1,0 +1,61 @@
+/* === CSS VARIABLES === */
+
+:root {
+    --btn-size-mobile:    8rem;
+    --btn-border-mobile:  0.425rem;
+    --btn-gap-mobile:     1.5rem;
+}
+
+
+/* === MOBILE OPTIMISATION === */
+
+@media (max-width: 480px) {
+
+
+    /* === HEADER === */
+
+    .header {
+        height: 10.5rem;
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+    }
+
+    #level-title {   
+        font-size: 1.15rem;
+        margin: 1.5% auto;
+        padding: 0 0.5rem;
+    }
+
+
+    /* === GRID LAYOUT === */
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(2, var(--btn-size-mobile));
+        grid-gap: var(--btn-gap-mobile);
+        margin: 3rem 0;
+    }
+
+
+    /* === BUTTON STYLES === */
+
+    .btn {
+        width: var(--btn-size-mobile);
+        height: var(--btn-size-mobile);
+        border: var(--btn-border-mobile) solid #000;
+        border-radius: 15%;
+    }
+
+
+    /* === FOOTER & CREDITS === */
+
+    .footer {
+        font-size: 0.55rem;
+        padding: 1.25rem 0;
+    }
+
+    .credit {
+        margin: 1.5% auto;
+        padding: 0 1rem;
+    }
+}

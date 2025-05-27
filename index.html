@@ -5,7 +5,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simon Game</title>
-  <link rel="stylesheet" href="styles.css">
+
+  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="stylesheet" href="./css/style-tablet.css">
+  <link rel="stylesheet" href="./css/style-mobile.css">
+
   <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
   <link rel="icon" href="favicon.ico">
   <meta name="theme-color" content="#011F3F">
@@ -13,58 +17,49 @@
 </head>
 
 <body>
-  <div class="flex-container">
     
-    <header class="header">
-      <h1 id="level-title">Press ENTER to Start</h1>  
-    </header>
-    
-    <main class="grid-container">
-
-      <div id="green" class="btn green"></div>
-
-      <div id="red" class="btn red"></div>
-
-      <div id="yellow" class="btn yellow"></div>
-
-      <div id="blue" class="btn blue"></div>  
-
-    </main>  
-
-    <footer class="footer">
-      <div class="credit">
-        <p>
-          Basic HTML & CSS templates provided by
-          <a 
-            href="https://appbrewery.com/" 
-            title="Visit The App Brewery" 
-            target="_blank" 
-            rel="noopener noreferrer">
-            The App Brewery.
-          </a><br>
-          Revision and
-          <a 
-            href="https://github.com/David-Voss/Simon-Game" 
-            title="View project on GitHub" 
-            target="_blank" 
-            rel="noopener noreferrer">
-            JavaScript implementation
-          </a> by
-          <a 
-            href="https://github.com/David-Voss" 
-            title="Visit David Voß's GitHub profile" 
-            target="_blank" 
-            rel="noopener noreferrer">
-            David Voß.
-          </a>
-        </p>
-      </div>
-    </footer>
-  </div>
+  <header class="header">
+    <h1 id="level-title">TOUCH or Press ENTER to Start</h1>  
+  </header>
   
-  
+  <main class="grid-container">
+    <div id="green" class="btn green"></div>
+    <div id="red" class="btn red"></div>
+    <div id="yellow" class="btn yellow"></div>
+    <div id="blue" class="btn blue"></div>
+  </main>  
+
+  <footer class="footer">
+    <div class="credit">
+      <p>
+        Initial basic HTML & CSS templates provided by
+        <a 
+          href="https://appbrewery.com/" 
+          title="Visit The App Brewery" 
+          target="_blank" 
+          rel="noopener noreferrer">
+          The App Brewery.
+        </a><br>
+        Code revision and
+        <a 
+          href="https://github.com/David-Voss/Simon-Game" 
+          title="View project on GitHub" 
+          target="_blank" 
+          rel="noopener noreferrer">
+          JavaScript implementation
+        </a> by
+        <a 
+          href="https://github.com/David-Voss" 
+          title="Visit David Voß's GitHub profile" 
+          target="_blank" 
+          rel="noopener noreferrer">
+          David Voß.
+        </a>
+      </p>
+    </div>
+  </footer>  
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script type="module" src="./script/index.js" defer></script>
+  <script type="module" src="./js/index.js" defer></script>
 </body>
 </html>
